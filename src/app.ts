@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 // --------------------------------------------------------
 import ResponseError from './models/response-error';
 
-import imageRouter from './routes/imagesService-route';
+import imageRouter from './routes/image-route';
 
 // --------------------------------------------------------
 
@@ -27,7 +27,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/images', imageRouter);
+app.use('/image', imageRouter);
 
 app.use((req: ExpRequest, _res, _next: ExpNextFun) => {
     throw new ResponseError(`sorry, it seems that the URL '${req.url}' is not provided!`, 404);
@@ -43,3 +43,5 @@ app.use((error: any, _req: ExpRequest, res: ExpResponse, _next: ExpNextFun) => {
         extraData,
     });
 });
+
+app.listen(process.env.PORT || 8085);

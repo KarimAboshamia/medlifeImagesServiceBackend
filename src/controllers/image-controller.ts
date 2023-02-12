@@ -6,12 +6,12 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 const bucketName = process.env.BUCKET_NAME;
 const bucketRegion = process.env.BUCKET_REGION;
 const s3AccessKey = process.env.S3_ACCESS_KEY;
-const s3SecretyKey = process.env.S3_SECRET_ACCESS;
+const s3SecretKey = process.env.S3_SECRET_ACCESS;
 
 const s3 = new S3Client({
     credentials: {
         accessKeyId: s3AccessKey,
-        secretAccessKey: s3SecretyKey,
+        secretAccessKey: s3SecretKey,
     },
     region: bucketRegion,
 });
@@ -27,12 +27,14 @@ const postImage = async (req: ExpRequest, res: ExpResponse, next: ExpNextFunc) =
         Body: req.file.buffer,
         ContentType: req.file.mimetype,
     };
+
     try {
         const command = new PutObjectCommand(params);
         await s3.send(command);
     } catch (err) {
-        return err;
+        return next(err);
     }
+
     //! [3] Return image name
     return res.status(200).json({ name: imageName });
 };
@@ -47,16 +49,17 @@ const deleteImage = async (req: ExpRequest, res: ExpResponse, next: ExpNextFunc)
             Bucket: bucketName,
             Key: image,
         };
+
         try {
             const command = new DeleteObjectCommand(params);
             await s3.send(command);
         } catch (err) {
-            return err;
+            return next(err);
         }
     }
 
     //! [3] Return success message
-    return res.status(200);
+    return res.status(200).end();
 };
 
 const generateUrl = async (req: ExpRequest, res: ExpResponse, next: ExpNextFunc) => {
@@ -72,12 +75,13 @@ const generateUrl = async (req: ExpRequest, res: ExpResponse, next: ExpNextFunc)
                 Bucket: bucketName,
                 Key: im,
             };
+
             try {
                 const command = new GetObjectCommand(params);
                 const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
                 imageUrls.push(url);
             } catch (err) {
-                return err;
+                next(err);
             }
         }
         responseURLs.push(imageUrls);
