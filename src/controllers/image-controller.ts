@@ -2,6 +2,7 @@ import { Request as ExpRequest, Response as ExpResponse, NextFunction as ExpNext
 import crypto from 'crypto';
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { type } from 'os';
 
 const bucketName = process.env.BUCKET_NAME;
 const bucketRegion = process.env.BUCKET_REGION;
@@ -39,10 +40,8 @@ const postImage = async (req: ExpRequest, res: ExpResponse, next: ExpNextFunc) =
     return res.status(200).json({ name: imageName });
 };
 
-const deleteImage = async (req: ExpRequest, res: ExpResponse, next: ExpNextFunc) => {
-    //! [1] Extract image/s name from request body
-    const { imageName } = req.body;
 
+const brokerDelete = async (imageName: any) => {
     //! [2] Delete image/s from s3
     for (const image of imageName) {
         const params = {
@@ -54,19 +53,15 @@ const deleteImage = async (req: ExpRequest, res: ExpResponse, next: ExpNextFunc)
             const command = new DeleteObjectCommand(params);
             await s3.send(command);
         } catch (err) {
-            return next(err);
+            throw err;
         }
     }
 
     //! [3] Return success message
-    return res.status(200).end();
+    return { message: 'success' };
 };
 
-const generateUrl = async (req: ExpRequest, res: ExpResponse, next: ExpNextFunc) => {
-    //! [1] Extract image/s name from request body
-    const { images } = req.body;
-
-    //! [2] Generate url/s for image/s
+const brokerURL = async (images:any) => {
     let responseURLs = [];
     for (let image of images) {
         let imageUrls = [];
@@ -81,20 +76,20 @@ const generateUrl = async (req: ExpRequest, res: ExpResponse, next: ExpNextFunc)
                 const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
                 imageUrls.push(url);
             } catch (err) {
-                next(err);
+                throw err;
             }
         }
         responseURLs.push(imageUrls);
     }
 
     //! [3] Return url/s
-    return res.status(200).json({ responseURLs: responseURLs });
+    return responseURLs;
 };
 
 const imageController = {
     postImage,
-    deleteImage,
-    generateUrl,
+    brokerDelete,
+    brokerURL,
 };
 
 export default imageController;
