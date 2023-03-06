@@ -1,6 +1,9 @@
 import amqp from 'amqplib';
 import imageController from '../controllers/image-controller';
 
+
+const brokerURL = process.env.BROKER_URL;
+
 export const generateUrl = async (queueName: string, channel: amqp.Channel) => {
     channel.consume(
         queueName,
@@ -45,7 +48,7 @@ export const deleteImage = async (queueName: string, channel: amqp.Channel) => {
 export async function createChannel(): Promise<{ channel: amqp.Channel }> {
     try {
         const connection = await amqp.connect(
-            'amqps://hxhbuwqc:pNhM1LZazWWxYJ9N_HPpHD0TRTNR-2-H@rat.rmq2.cloudamqp.com/hxhbuwqc'
+            brokerURL
         );
         const channel = await connection.createChannel();
 
