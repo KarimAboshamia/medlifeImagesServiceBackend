@@ -7,7 +7,6 @@ const deleteImageQueue = process.env.DELETE_IMAGE_QUEUE;
 //create function without requests
 export const callReceiver = async () => {
     try {
-        console.log("Here")
         const {channel} = await createChannel();
 
         await createQueue(generateUrlQueue, channel);
@@ -17,6 +16,6 @@ export const callReceiver = async () => {
         deleteImage(deleteImageQueue, channel);
 
     } catch (e) {
-        console.log(e);
+        throw e;
     }
 };

@@ -10,7 +10,5 @@ const uploadImages = multer({
 });
 
 imageRouter.post('/images/create', uploadImages.single('file'), imageController.postImage);
-imageRouter.delete('/images/delete', imageController.deleteImage);
-imageRouter.post('/images/generate', imageController.generateUrl);
 
 export default imageRouter;

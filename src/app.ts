@@ -11,7 +11,6 @@ import { callReceiver } from './middleware/broker-middleware';
 
 const app = express();
 callReceiver();
-console.log("running")
 
 //? parsing coming request body
 app.use(bodyParser.urlencoded({ extended: false }));
