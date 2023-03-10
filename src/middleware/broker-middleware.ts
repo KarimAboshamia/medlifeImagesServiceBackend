@@ -1,4 +1,5 @@
 import { createChannel, createQueue, generateUrl, deleteImage } from "../utilities/message-broker-utility";
+import ChannelMySingleton from "../utilities/singleton-utility";
 
 //get env variable
 const generateUrlQueue = process.env.GENERATE_URLS_QUEUE;
@@ -7,13 +8,15 @@ const deleteImageQueue = process.env.DELETE_IMAGE_QUEUE;
 //create function without requests
 export const callReceiver = async () => {
     try {
-        const {channel} = await createChannel();
+        const mySingletonInstance = ChannelMySingleton.getInstance();
 
-        await createQueue(generateUrlQueue, channel);
-        generateUrl(generateUrlQueue, channel);
+        await createChannel();
 
-        await createQueue(deleteImageQueue, channel);
-        deleteImage(deleteImageQueue, channel);
+        await createQueue(generateUrlQueue, mySingletonInstance.channel);
+        generateUrl(generateUrlQueue, mySingletonInstance.channel);
+
+        await createQueue(deleteImageQueue, mySingletonInstance.channel);
+        deleteImage(deleteImageQueue, mySingletonInstance.channel);
 
     } catch (e) {
         throw e;

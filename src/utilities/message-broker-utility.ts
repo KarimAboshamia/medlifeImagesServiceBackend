@@ -1,5 +1,6 @@
 import amqp from 'amqplib';
 import imageController from '../controllers/image-controller';
+import ChannelMySingleton from './singleton-utility';
 
 const brokerURL = process.env.BROKER_URL;
 
@@ -36,11 +37,23 @@ export const deleteImage = async (queueName: string, channel: amqp.Channel) => {
 export async function createChannel(): Promise<{ channel: amqp.Channel }> {
     try {
         const connection = await amqp.connect(brokerURL);
-        const channel = await connection.createChannel();
+        let channel = await connection.createChannel();
+
+        const mySingletonInstance = ChannelMySingleton.getInstance();
+
+        mySingletonInstance.channel = channel;
+
+        //when connection is closed reopen channel
+        channel.on('error', async () => {
+            // Re-open the channel
+            await connection.createChannel().then((newChannel) => {
+                channel = newChannel;
+                mySingletonInstance.channel = channel;
+            });
+        });
 
         return { channel };
     } catch (error) {
-        console.log("Error in creating channel: Receiver", error);
         throw error;
     }
 }
