@@ -40,6 +40,7 @@ export async function createChannel(): Promise<{ channel: amqp.Channel }> {
 
         return { channel };
     } catch (error) {
+        console.log("Error in creating channel: Receiver", error);
         throw error;
     }
 }
