@@ -25,7 +25,14 @@ export const deleteImage = async (queueName: string, channel: amqp.Channel) => {
         async (msg) => {
             channel.ack(msg!);
 
-            const res = await imageController.brokerDelete(JSON.parse(String(msg!.content)));
+            let res;
+
+            try {
+                res = await imageController.brokerDelete(JSON.parse(String(msg!.content)));
+            } catch (error) {
+                res = error;
+            }
+
             channel.sendToQueue(msg?.properties.replyTo!, Buffer.from(JSON.stringify({ res })), {
                 correlationId: msg?.properties.correlationId,
             });

@@ -40,28 +40,26 @@ const postImage = async (req: ExpRequest, res: ExpResponse, next: ExpNextFunc) =
     return res.status(200).json({ name: imageName });
 };
 
-
 const brokerDelete = async (imageName: any) => {
     //! [2] Delete image/s from s3
-    for (const image of imageName) {
-        const params = {
-            Bucket: bucketName,
-            Key: image,
-        };
+    try {
+        for (const image of imageName) {
+            const params = {
+                Bucket: bucketName,
+                Key: image,
+            };
 
-        try {
             const command = new DeleteObjectCommand(params);
             await s3.send(command);
-        } catch (err) {
-            throw err;
         }
+    } catch (err) {
+        throw err;
     }
-
     //! [3] Return success message
     return { message: 'success' };
 };
 
-const brokerURL = async (images:any) => {
+const brokerURL = async (images: any) => {
     let responseURLs = [];
     for (let image of images) {
         let imageUrls = [];
