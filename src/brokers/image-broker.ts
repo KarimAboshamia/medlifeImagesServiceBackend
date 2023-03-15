@@ -4,8 +4,6 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import AWSCloudSingleton from '../models/aws-cloud-singleton';
 
 const deleteImages = async (imagesName: string[]) => {
-    console.log('imagesName', imagesName);
-
     try {
         const AWSSingleton = AWSCloudSingleton.getInstance();
 
@@ -22,12 +20,10 @@ const deleteImages = async (imagesName: string[]) => {
         throw err;
     }
 
-    return { message: 'image deleted successfully!', status: 200 };
+    return { message: 'image deleted successfully!', statusCode: 200 };
 };
 
 const generateUrls = async (imagesName: string[][]) => {
-    console.log('imagesName', imagesName);
-
     let responseURLs = [];
 
     try {
@@ -54,7 +50,7 @@ const generateUrls = async (imagesName: string[][]) => {
         throw err;
     }
 
-    return { message: 'urls generated successfully!', status: 200, responseURLs };
+    return { message: 'urls generated successfully!', statusCode: 200, responseURLs };
 };
 
 const imageBroker = {
