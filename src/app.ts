@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import ResponseError from './models/response-error';
 
 import imageRouter from './routes/image-route';
-import { callReceiver } from './middleware/broker-middleware';
+import { callReceiver } from './utilities/receiving-message-broker-utility';
 
 // --------------------------------------------------------
 
