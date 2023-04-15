@@ -25,7 +25,11 @@ export const pullMessageFromQueue = async (
                 try {
                     res = await controller(data);
                 } catch (error) {
-                    res = error;
+                    res = {
+                        ...error,
+                        message: error.message,
+                        statusCode: error.statusCode || error.status || 500,
+                    };
                 }
 
                 channel.sendToQueue(msg?.properties.replyTo!, Buffer.from(JSON.stringify(res)), {
