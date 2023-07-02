@@ -32,7 +32,7 @@ export const pullMessageFromQueue = async (
                     };
                 }
 
-                channel.sendToQueue(msg?.properties.replyTo!, Buffer.from(JSON.stringify(res)), {
+                await channel.sendToQueue(msg?.properties.replyTo!, Buffer.from(JSON.stringify(res)), {
                     correlationId: msg?.properties.correlationId,
                 });
             },
@@ -83,10 +83,10 @@ export const callReceiver = async () => {
         await createChannel();
 
         await createQueue(GENERATE_URLS_QUEUE, receivingChannel.channel);
-        pullMessageFromQueue(GENERATE_URLS_QUEUE, receivingChannel.channel, imageBroker.generateUrls);
+        await pullMessageFromQueue(GENERATE_URLS_QUEUE, receivingChannel.channel, imageBroker.generateUrls);
 
         await createQueue(DELETE_IMAGE_QUEUE, receivingChannel.channel);
-        pullMessageFromQueue(DELETE_IMAGE_QUEUE, receivingChannel.channel, imageBroker.deleteImages);
+        await pullMessageFromQueue(DELETE_IMAGE_QUEUE, receivingChannel.channel, imageBroker.deleteImages);
     } catch (error) {
         throw error;
     }
